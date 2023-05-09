@@ -53,6 +53,13 @@ jobs:
                   distribution: 'zulu'
                   java-version: ${{ env.JAVA_VERSION }}
             - run: ./ci_clear_gradle_cache.sh
+            - name: Download golden roborazzi screenshots
+              uses: dawidd6/action-download-artifact@v2
+              with:
+                  name: roborazzi-screenshots
+                  path: coil-test-roborazzi/build/outputs/roborazzi
+                  workflow: ci.yaml
+                  branch: main
             - uses: actions/cache@v3
               with:
                   path: |
@@ -62,6 +69,14 @@ jobs:
 
             - name: Unit tests
               run: ./gradlew testDebugUnitTest verifyPaparazziDebug verifyRoborazziDebug
+
+            - name: Record roborazzi screenshots
+              run: ./gradlew recordRoborazziDebug
+            - uses: actions/upload-artifact@v3
+              with:
+                name: roborazzi-screenshots
+                path: coil-test-roborazzi/build/outputs/roborazzi
+                retention-days: 30
 
     instrumentation-tests:
         name: Instrumentation tests
